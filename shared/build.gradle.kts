@@ -2,13 +2,19 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.sqldelight)
-
 }
 
 kotlin {
     androidTarget()
-    iosArm64()
-    iosSimulatorArm64()
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "Shared"
+            isStatic = true
+        }
+    }
     
     sourceSets {
         commonMain.dependencies {
@@ -24,6 +30,7 @@ kotlin {
 
         iosMain.dependencies {
             implementation(libs.sqldelight.native.driver)
+            implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
